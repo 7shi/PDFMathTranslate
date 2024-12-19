@@ -5,7 +5,7 @@ import re
 import unicodedata
 from copy import copy
 import deepl
-import ollama
+import ollama, httpx, sys
 import openai
 import requests
 from azure.ai.translation.text import TextTranslationClient
@@ -206,7 +206,7 @@ class OllamaTranslator(BaseTranslator):
     def __init__(self, lang_in, lang_out, model, envs=None, prompt=None):
         self.set_envs(envs)
         if not model:
-            model = self.envs["OLLAMA_MODEL"]
+            model = self.envs["OLLAMA_MODEL"].split(";")
         super().__init__(lang_in, lang_out, model)
         self.options = {"temperature": 0}  # 随机采样可能会打断公式标记
         self.client = ollama.Client(timeout = 180)
@@ -216,12 +216,18 @@ class OllamaTranslator(BaseTranslator):
         print(len(self.prompt(text, self.prompttext)))
         print(self.prompt(text, self.prompttext)[0])
         print(self.prompt(text, self.prompttext)[1])
-        response = self.client.chat(
-            model=self.model,
-            options=self.options,
-            messages=self.prompt(text, self.prompttext),
-        )
-        return response["message"]["content"].strip()
+        for model in self.models:
+            try:
+                response = self.client.chat(
+                    model=model,
+                    options=self.options,
+                    messages=self.prompt(text, self.prompttext),
+                )
+                return response["message"]["content"].strip()
+            except httpx.TimeoutException:
+                continue
+        print("All models timed out")
+        sys.exit(1)
 
 
 class OpenAITranslator(BaseTranslator):

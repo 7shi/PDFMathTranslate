@@ -78,6 +78,13 @@ set OPENAI_MODEL=gpt-4o-mini
 pdf2zh example.pdf -s openai
 ```
 
+To specify multiple models for `OLLAMA_MODEL`, separate them with `;`:
+
+```bash
+set OLLAMA_MODEL=gemma2;aya-expanse
+pdf2zh example.pdf -s ollama
+```
+
 [⬆️ Back to top](#toc)
 
 ---
