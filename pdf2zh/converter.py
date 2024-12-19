@@ -16,7 +16,6 @@ import re
 import concurrent.futures
 import numpy as np
 import unicodedata
-from tenacity import retry, wait_fixed
 from pdf2zh import cache
 from pdf2zh.translator import (
     AzureOpenAITranslator,
@@ -331,7 +330,6 @@ class TranslateConverter(PDFConverterEx):
         hash_key = cache.deterministic_hash("PDFMathTranslate")
         cache.create_cache(hash_key)
 
-        @retry(wait=wait_fixed(1))
         def worker(s: str):  # 多线程翻译
             if not s.strip() or re.match(r"^\{v\d+\}$", s):  # 空白和公式不翻译
                 return s
