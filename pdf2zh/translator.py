@@ -209,7 +209,7 @@ class OllamaTranslator(BaseTranslator):
             model = self.envs["OLLAMA_MODEL"]
         super().__init__(lang_in, lang_out, model)
         self.options = {"temperature": 0}  # 随机采样可能会打断公式标记
-        self.client = ollama.Client()
+        self.client = ollama.Client(timeout = 180)
         self.prompttext = prompt
 
     def translate(self, text):
