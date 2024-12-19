@@ -226,6 +226,9 @@ class OllamaTranslator(BaseTranslator):
                 return response["message"]["content"].strip()
             except httpx.TimeoutException:
                 continue
+            except Exception as e:
+                print(f"Exception occurred: {e}")
+                sys.exit(1)
         print("All models timed out")
         sys.exit(1)
 
